@@ -73,9 +73,19 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
+      image: 'img/DigitallyRefined-banner.jpg',
       navbar: {
+        logo: {
+          alt: 'DigitallyRefined Logo',
+          src: 'img/DigitallyRefined-avatar.jpg',
+        },
         title: 'DigitallyRefined',
         items: [
+          {
+            href: 'https://www.youtube.com/@DigitallyRefined',
+            label: 'YouTube',
+            position: 'right',
+          },
           {
             href: 'https://github.com/DigitallyRefined/DigitallyRefined.github.io',
             label: 'GitHub',
@@ -87,7 +97,33 @@ const config = {
         style: 'dark',
         links: [
           {
+            title: 'Community',
             items: [
+              {
+                label: 'Discord',
+                href: 'https://discordapp.com/invite/PnpA7JYf33',
+              },
+              {
+                label: 'Mastodon',
+                href: 'https://mastodon.social/@DigitallyRefined',
+              },
+              {
+                label: 'Twitter',
+                href: 'https://twitter.com/DigitallyRefine',
+              },
+            ],
+          },
+          {
+            title: 'More',
+            items: [
+              {
+                label: 'YouTube',
+                href: 'https://www.youtube.com/@DigitallyRefined',
+              },
+              {
+                label: 'Patreon',
+                href: 'https://patreon.com/DigitallyRefined',
+              },
               {
                 label: 'GitHub',
                 href: 'https://github.com/DigitallyRefined/DigitallyRefined.github.io',
@@ -96,6 +132,10 @@ const config = {
           },
         ],
         copyright: `Copyright (ISC) © ${new Date().getFullYear()} DigitallyRefined. Built with Docusaurus.`,
+      },
+      colorMode: {
+        defaultMode: 'dark',
+        respectPrefersColorScheme: true,
       },
       prism: {
         theme: lightCodeTheme,
