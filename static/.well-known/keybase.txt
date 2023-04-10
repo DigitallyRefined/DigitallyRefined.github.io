@@ -1,0 +1,58 @@
+digitallyrefined
+DigitallyRefined
+==================================================================
+https://keybase.io/digitallyrefined
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://digitallyrefined.github.io
+  * I am digitallyrefined (https://keybase.io/digitallyrefined) on keybase.
+  * I have a public key ASA_mibEqYZEsePDmiL6IzCSLXkj9QRVXqRaAsv8o4gMcwo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "01203f9a26c4a98644b1e3c39a22fa2330922d7923f504555ea45a02cbfca3880c730a",
+      "host": "keybase.io",
+      "kid": "01203f9a26c4a98644b1e3c39a22fa2330922d7923f504555ea45a02cbfca3880c730a",
+      "uid": "c35454edb39a9e56b4ebe95b627f0119",
+      "username": "digitallyrefined"
+    },
+    "merkle_root": {
+      "ctime": 1681121197,
+      "hash": "a84c5c9257b13450533946703c3401ca276642e614b8e5ce8c3c65614f1adbe23c815e089c7cc9aab1a51cf5581120b03d92ba90841aeae05474eab05629887b",
+      "hash_meta": "9ceaa7184a7e184caa4f46147693c457c35758fceb3d80fc692e8507310c2c36",
+      "seqno": 24314583
+    },
+    "service": {
+      "entropy": "wpXq2d42+r/ybGQFPpGgp5yo",
+      "hostname": "digitallyrefined.github.io",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "6.0.2"
+  },
+  "ctime": 1681121343,
+  "expire_in": 504576000,
+  "prev": "8dbc7eac81179df1afb77e0686c53889d06eb8431060561f9ff13166d8e28763",
+  "seqno": 5,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgP5omxKmGRLHjw5oi+iMwki15I/UEVV6kWgLL/KOIDHMKp3BheWxvYWTESpcCBcQgjbx+rIEXnfGvt34GhsU4idBuuEMQYFYfn/ExZtjih2PEILOql5xLElysWOgVmOJCY/1Ee5Nz7SBPTjj3PwjWmw1KAgHCo3NpZ8RAw5yGzdy3tvnqMXjhGGm/UutalUSzmkFfT1DQDYGC4etsEjOwrlu3J62/jRmm+cvPRsY49uYsumTtIGOpkYEzBqhzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIKn0k17G9XsoL1sjTc3+pKcg/tqHkl2Q8JV8MPsjraIeo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/digitallyrefined
+
+==================================================================
