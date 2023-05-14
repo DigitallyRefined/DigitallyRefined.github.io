@@ -3,13 +3,14 @@
 
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const remarkOembed = require('remark-oembed');
 
 // Reverse the sidebar items ordering (including nested category items)
 function reverseSidebarItems(items) {
   // Reverse items in categories
   const result = items.map((item) => {
     if (item.type === 'category') {
-      return {...item, items: reverseSidebarItems(item.items)};
+      return { ...item, items: reverseSidebarItems(item.items) };
     }
     return item;
   });
@@ -61,6 +62,7 @@ const config = {
             const sidebarItems = await defaultSidebarItemsGenerator(args);
             return reverseSidebarItems(sidebarItems);
           },
+          remarkPlugins: [remarkOembed],
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

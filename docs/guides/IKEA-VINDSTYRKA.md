@@ -14,6 +14,8 @@ import TOCInline from '@theme/TOCInline';
 
 https://youtu.be/EvjTHlPT9zM
 
+<a href="https://youtu.be/EvjTHlPT9zM">Watch on YouTube</a>
+
 ## Features
 
 * PM2.5
