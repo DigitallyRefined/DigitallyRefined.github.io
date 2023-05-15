@@ -144,6 +144,13 @@ const config = {
         darkTheme: darkCodeTheme,
       },
     }),
+
+  scripts: [
+    {
+      src: 'https://app.tinyanalytics.io/pixel/DgTq8YQ6wysFwYDx',
+      defer: true,
+    },
+  ],
 };
 
 module.exports = config;

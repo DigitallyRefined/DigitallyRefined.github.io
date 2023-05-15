@@ -17,6 +17,8 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --ifm-navbar-background-color: #1f2636;
   --ifm-navbar-link-color: var(--ifm-color-gray-100);
+  --hero-background: #1f2636;
+  --hero-title-background: linear-gradient(to right, #95c2e0 10%, #da864b 50%);
 }
 
 .navbar button {
@@ -35,6 +37,25 @@
   color: var(--ifm-menu-color-active);
 }
 
+.hero--primary {
+  padding: 2rem;
+  margin-bottom: 2rem;
+  background-color: var(--hero-background);
+  border-radius: var(--ifm-global-radius);
+}
+
+.hero__title {
+  background: var(--hero-title-background);
+  width: 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero__subtitle {
+  color: white;
+}
+
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
   --ifm-color-primary: #25c2a0;
@@ -45,4 +66,6 @@
   --ifm-color-primary-lighter: #32d8b4;
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --hero-background: #313847;
+  --hero-title-background: linear-gradient(to right, #c2858d 10%, #79b1b8 50%);
 }
