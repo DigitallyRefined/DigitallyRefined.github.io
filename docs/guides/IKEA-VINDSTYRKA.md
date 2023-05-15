@@ -47,6 +47,8 @@ https://youtu.be/EvjTHlPT9zM
 
 Currently if you're using the default [ZHA integration](https://www.home-assistant.io/integrations/zha/) for your Zigbee coordinator, the tVOC sensor wont be available in Home Assistant. However, tVOC is available via the [Zigbee2MQTT plug-in](https://github.com/zigbee2mqtt/hassio-zigbee2mqtt#installation) (so if you're using Zigbee2MQTT there's no need to apply the patch below).
 
+See also: [differences between ZHA and Zigbee2MQTT](https://youtu.be/RWzzNe5gm5s).
+
 There are currently 2 GitHub pull requests to enable it, however at the time of publishing they weren't merged:
 
 * [Add support for IKEA VINDSTYRKA Air quality Sensor #2315](https://github.com/zigpy/zha-device-handlers/pull/2315)
