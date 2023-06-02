@@ -186,17 +186,23 @@ services:
 ```bash
 docker compose up -d
 docker compose logs -f
+```
 
+After a few minutes you should now be able to access your new Headscale server by going to your subdomain `https://choose-a-subdomain-1234.fly.dev/swagger`
+
+#### Create a new user for your Headscale server
+
+```bash
 docker exec headscale headscale users create my-user
 ```
 
-### Tailscale client custom control server URL setup
+### Joining Tailscale clients to the network using your custom control server URL
 
 * [Windows](https://github.com/juanfont/headscale/blob/main/docs/windows-client.md)
 * [macOS](https://github.com/juanfont/headscale/issues/106#issuecomment-918843218) (and create a [preauth key](#create-a-new-preauth-key))
+* [Linux](#docker-compose-setup-to-run-tailscale-on-linux)
 * [Android](https://github.com/juanfont/headscale/blob/main/docs/android-client.md)
 * [iOS](https://github.com/juanfont/headscale/blob/main/docs/iOS-client.md)
-* [Linux](#docker-compose-setup-to-run-tailscale-on-linux)
 
 #### Registering a new device and allowing it to join your network
 
@@ -220,8 +226,7 @@ cd ~/tailscale
 nano docker-compose.yml
 ```
 
-
-Add the preauth key to the `TS_AUTHKEY` environment variable
+Update the `--login-server` URL and `--advertise-routes` to match your network, then add the preauth key to the `TS_AUTHKEY` environment variable (this key only used once on first run to join the network).
 
 ```yml
 services:
