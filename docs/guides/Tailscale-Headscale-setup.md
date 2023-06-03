@@ -86,7 +86,9 @@ app = "choose-a-subdomain-1234"
 
 ### Launching the Fly.io app
 
-[Sign up for a Fly.io account](https://fly.io/app/sign-up) (you can use a temporary credit card from [privacy.com](https://privacy.com/) in the US or [Revolut](https://www.revolut.com/) in some parts of Europe)
+[Sign up for a free Fly.io account](https://fly.io/app/sign-up)
+
+This setup uses 1 Fly.io app. As long as you don't have more than 3 Fly.io apps running you wont be exceeding [Fly.io's free allowance](https://fly.io/docs/about/pricing/#free-allowances), but you will need to add a credit card to launch this app. You can use a temporary credit card from [privacy.com](https://privacy.com/) in the US or [Revolut](https://www.revolut.com/) in some parts of Europe. Make sure that you check [their current free allowances](https://fly.io/docs/about/pricing/#free-allowances), as they may have changed since this guide was published.
 
 ```bash
 fly auth login
