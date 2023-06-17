@@ -30,6 +30,7 @@ curl -L https://fly.io/install.sh | sh
 ```bash
 echo 'export FLYCTL_INSTALL="$HOME/.fly"' >> ~/.bashrc
 echo 'export PATH="$FLYCTL_INSTALL/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ### Fly.io deployment
