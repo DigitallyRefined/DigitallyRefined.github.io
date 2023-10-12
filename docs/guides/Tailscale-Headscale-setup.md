@@ -52,7 +52,7 @@ Note: you can update `choose-a-subdomain-1234` and `my-user` to any value you'd 
 app = "choose-a-subdomain-1234"
 
 [build]
-  image = "ghcr.io/digitallyrefined/docker-wireguard-tunnel:v2"
+  image = "ghcr.io/digitallyrefined/docker-wireguard-tunnel:v3"
 
 [env]
   DOMAIN = "choose-a-subdomain-1234.fly.dev"
@@ -171,7 +171,7 @@ services:
 
   fly-wireguard-peer:
     container_name: headscale-fly-wireguard-peer
-    image: ghcr.io/digitallyrefined/docker-wireguard-tunnel:v2
+    image: ghcr.io/digitallyrefined/docker-wireguard-tunnel:v3
     restart: unless-stopped
     environment:
       # Note that DOMAIN & PEERS are not required for the peer
