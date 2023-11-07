@@ -29,8 +29,9 @@ https://youtu.be/HABmLjZ2mWQ
 ## Pros
 
 * Relatively inexpensive way to add presence, motion and room brightness data to your smart home
+* Much more sensitive than a regular PIR motion sensor and can easily detect people that are sitting still
 * Can perform automatons based on sensor data, such as turning on/off lights
-* Can perform different actions/automations based on where the motion/presence was detected (zones)
+* Beta zones feature can perform different actions/automations based on where the motion/presence was detected
 * Can see through thin walls
 * Can extend your Home Assistant Bluetooth range via proxy
 * Good quality braided cable
