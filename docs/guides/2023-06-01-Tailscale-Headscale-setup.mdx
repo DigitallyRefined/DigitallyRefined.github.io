@@ -2,7 +2,7 @@
 sidebar_position: 2
 slug: /guides/Tailscale-Headscale-setup
 last_update:
-  date: 2023-10-12
+  date: 2023-12-23
 ---
 
 # Tailscale & Headscale
@@ -12,6 +12,12 @@ last_update:
 [Headscale](https://headscale.net/) is an open source implementation of the [Tailscale](https://tailscale.com/) coordination server.
 
 This guide will step through setting up your own self hosted private and secure remote access. This is currently my preferred setup using Tailscale clients along with a self hosted Headscale Docker container.
+
+:::warning
+
+Fly.io no longer offer free [dedicated IPv4 addresses](https://fly.io/docs/about/pricing/#anycast-ip-addresses). Mentions of this being a free service in the video below are now no longer correct.
+
+:::
 
 import TOCInline from '@theme/TOCInline';
 
@@ -100,9 +106,9 @@ app = "choose-a-subdomain-1234"
 
 ### Launching the Fly.io app
 
-[Sign up for a free Fly.io account](https://fly.io/app/sign-up)
+[Sign up for a Fly.io account](https://fly.io/app/sign-up)
 
-This setup uses 1 Fly.io app. As long as you don't have more than 3 Fly.io apps running you wont be exceeding [Fly.io's free allowance](https://fly.io/docs/about/pricing/#free-allowances), but you will need to add a credit card to launch this app. You can use a temporary credit card from [privacy.com](https://privacy.com/) in the US or [Revolut](https://www.revolut.com/) in some parts of Europe. Make sure that you check [their current free allowances](https://fly.io/docs/about/pricing/#free-allowances), as they may have changed since this guide was published.
+This setup uses 1 Fly.io app. As long as you don't have more than 3 Fly.io apps running you wont be exceeding [Fly.io's free allowance](https://fly.io/docs/about/pricing/#free-allowances) in terms of server usage, however dedicated IPv4 addresses are now a [paid for feature](https://fly.io/docs/about/pricing/#anycast-ip-addresses), so you will need to add a credit card to launch this app. You can use a temporary credit card from [privacy.com](https://privacy.com/) in the US or [Revolut](https://www.revolut.com/) in some parts of Europe. Make sure that you check [their current free allowances](https://fly.io/docs/about/pricing/#free-allowances), as they may have changed since this guide was published.
 
 ```bash
 fly auth login
