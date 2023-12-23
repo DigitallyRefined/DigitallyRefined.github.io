@@ -1,5 +1,8 @@
 ---
 sidebar_position: 2
+slug: /guides/Tailscale-Headscale-setup
+last_update:
+  date: 2023-10-12
 ---
 
 # Tailscale & Headscale
@@ -10,11 +13,21 @@ sidebar_position: 2
 
 This guide will step through setting up your own self hosted private and secure remote access. This is currently my preferred setup using Tailscale clients along with a self hosted Headscale Docker container.
 
+import TOCInline from '@theme/TOCInline';
+
 <TOCInline toc={toc} />
 
 ## Video
 
-https://youtu.be/rGJ5RvB_aBg
+import LiteYouTubeEmbed from 'react-lite-youtube-embed';
+import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
+
+<LiteYouTubeEmbed
+  id="rGJ5RvB_aBg"
+  title="Tailscale & Headscale - Setting up your own self hosted remote access"
+  poster="maxresdefault"
+  webp
+/>
 
 <a href="https://youtu.be/rGJ5RvB_aBg">Watch on YouTube</a>
 
@@ -272,4 +285,10 @@ Now each of client should be able connect with each other and access local netwo
 * [How Tailscale works](https://tailscale.com/blog/how-tailscale-works/)
 * <a href="https://youtu.be/wLrmmh1eI94?t=937">Traefik HTTPS tutorial</a>
 
-https://youtu.be/wLrmmh1eI94?t=937
+<LiteYouTubeEmbed
+  id="wLrmmh1eI94"
+  title="Is this the BEST Reverse Proxy for Docker? // Traefik Tutorial"
+  params="start=937"
+  poster="maxresdefault"
+  webp
+/>

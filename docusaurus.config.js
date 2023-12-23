@@ -1,9 +1,9 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
-const remarkOembed = require('remark-oembed');
+const { themes } = require('prism-react-renderer');
+const lightCodeTheme = themes.github;
+const darkCodeTheme = themes.dracula;
 
 // Reverse the sidebar items ordering (including nested category items)
 function reverseSidebarItems(items) {
@@ -62,7 +62,6 @@ const config = {
             const sidebarItems = await defaultSidebarItemsGenerator(args);
             return reverseSidebarItems(sidebarItems);
           },
-          remarkPlugins: [remarkOembed],
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -142,6 +141,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+        additionalLanguages: ['bash', 'diff', 'json'],
       },
     }),
 

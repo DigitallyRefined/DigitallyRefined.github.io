@@ -1,6 +1,6 @@
 # [DigitallyRefined.github.io](https://DigitallyRefined.github.io)
 
-[DigitallyRefined.github.io](https://DigitallyRefined.github.io) is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+[DigitallyRefined.github.io](https://DigitallyRefined.github.io) is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
 
 ### Installation
 
