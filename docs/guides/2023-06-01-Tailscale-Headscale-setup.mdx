@@ -15,7 +15,11 @@ This guide will step through setting up your own self hosted private and secure 
 
 :::warning
 
-Fly.io no longer offer free [dedicated IPv4 addresses](https://fly.io/docs/about/pricing/#anycast-ip-addresses). Mentions of this being a free service in the video below are now no longer correct.
+Mentions of this being a free service in the video below are now no longer correct.
+
+Fly.io no longer offer free [dedicated IPv4 addresses](https://fly.io/docs/about/pricing/#anycast-ip-addresses), these are now charged at $2/month for each IPv4 address. However, Fly.io wont charge for bills smaller than $5. So in theory as long as you don't exceed $5, this setup should still be free.
+
+Make sure that you check [their current free allowances](https://fly.io/docs/about/pricing/#free-allowances), as they may have changed since this guide was published.
 
 :::
 
@@ -108,7 +112,13 @@ app = "choose-a-subdomain-1234"
 
 [Sign up for a Fly.io account](https://fly.io/app/sign-up)
 
-This setup uses 1 Fly.io app. As long as you don't have more than 3 Fly.io apps running you wont be exceeding [Fly.io's free allowance](https://fly.io/docs/about/pricing/#free-allowances) in terms of server usage, however dedicated IPv4 addresses are now a [paid for feature](https://fly.io/docs/about/pricing/#anycast-ip-addresses), so you will need to add a credit card to launch this app. You can use a temporary credit card from [privacy.com](https://privacy.com/) in the US or [Revolut](https://www.revolut.com/) in some parts of Europe. Make sure that you check [their current free allowances](https://fly.io/docs/about/pricing/#free-allowances), as they may have changed since this guide was published.
+:::warning
+
+Make sure that you check [Fly.io's current free allowances](https://fly.io/docs/about/pricing/#free-allowances), as they may have changed since this guide was published.
+
+:::
+
+This setup uses 1 Fly.io app. As long as you don't have more than 3 Fly.io apps running you wont be exceeding [Fly.io's free allowance](https://fly.io/docs/about/pricing/#free-allowances) in terms of server usage, however dedicated IPv4 addresses are now a [paid for feature](https://fly.io/docs/about/pricing/#anycast-ip-addresses), so you will need to add a credit card to launch this app. You can use a temporary credit card from [privacy.com](https://privacy.com/) in the US or [Revolut](https://www.revolut.com/) in some parts of Europe.
 
 ```bash
 fly auth login
