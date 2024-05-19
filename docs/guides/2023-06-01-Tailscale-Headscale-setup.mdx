@@ -2,7 +2,7 @@
 sidebar_position: 2
 slug: /guides/Tailscale-Headscale-setup
 last_update:
-  date: 2023-12-23
+  date: 2024-05-19
 ---
 
 # Tailscale & Headscale
@@ -11,15 +11,17 @@ last_update:
 
 [Headscale](https://headscale.net/) is an open source implementation of the [Tailscale](https://tailscale.com/) coordination server.
 
-This guide will step through setting up your own self hosted private and secure remote access. This is currently my preferred setup using Tailscale clients along with a self hosted Headscale Docker container.
+This guide will step through setting up your own self hosted private and secure remote access using Tailscale clients along with a self hosted Headscale Docker container.
 
 :::warning
 
-Mentions of this being a free service in the video below are now no longer correct.
+Mentions of this being a free service in the video below are now no longer correct:
 
-Fly.io no longer offer free [dedicated IPv4 addresses](https://fly.io/docs/about/pricing/#anycast-ip-addresses), these are now charged at $2/month for each IPv4 address. However, Fly.io wont charge for bills smaller than $5. So in theory as long as you don't exceed $5, this setup should still be free.
+* To launch a server, a credit card is now required  (a temporary charge between $1-$10 will be taken to verify it)
+* Fly.io no longer offer free [dedicated IPv4 addresses](https://fly.io/docs/about/pricing/#anycast-ip-addresses), these are now charged at $2/month for each IPv4 address.
+* Fly.io gives new accounts [$5 of free trial credit and Hobby plans cost $5 per month](https://fly.io/docs/about/pricing/#new-customers-get-a-free-trial).
 
-Make sure that you check [their current free allowances](https://fly.io/docs/about/pricing/#free-allowances), as they may have changed since this guide was published.
+So in theory as long as you don't exceed the $5 free trial credit, this setup should still be free. Make sure that you check [their current free allowances](https://fly.io/docs/about/pricing/#free-allowances), as they may have changed since this guide was last published.
 
 :::
 
@@ -114,7 +116,7 @@ app = "choose-a-subdomain-1234"
 
 :::warning
 
-Make sure that you check [Fly.io's current free allowances](https://fly.io/docs/about/pricing/#free-allowances), as they may have changed since this guide was published.
+Make sure that you check [Fly.io's current free allowances](https://fly.io/docs/about/pricing/#free-allowances), as they may have changed since this guide was last published.
 
 :::
 
