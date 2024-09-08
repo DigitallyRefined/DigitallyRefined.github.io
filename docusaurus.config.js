@@ -35,6 +35,8 @@ const config = {
   projectName: 'DigitallyRefined.github.io', // Usually your repo name.
   trailingSlash: false,
 
+  favicon: '/img/favicon.ico',
+
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
