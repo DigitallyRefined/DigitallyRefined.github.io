@@ -16,9 +16,9 @@
     "update-dependencies": "npx npm-check-updates --target minor --upgrade && npm i && npx npm-check-updates"
   },
   "dependencies": {
-    "@docusaurus/core": "3.5.2",
-    "@docusaurus/preset-classic": "3.5.2",
-    "@mdx-js/react": "^3.0.1",
+    "@docusaurus/core": "3.6.3",
+    "@docusaurus/preset-classic": "3.6.3",
+    "@mdx-js/react": "^3.1.0",
     "clsx": "^2.1.1",
     "prism-react-renderer": "^2.4.0",
     "react": "^18.3.1",
@@ -26,9 +26,9 @@
     "react-lite-youtube-embed": "^2.4.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.5.2",
-    "@docusaurus/tsconfig": "3.5.2",
-    "typescript": "^5.5.4"
+    "@docusaurus/module-type-aliases": "3.6.3",
+    "@docusaurus/tsconfig": "3.6.3",
+    "typescript": "^5.7.2"
   },
   "license": "ISC",
   "browserslist": {
