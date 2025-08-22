@@ -124,8 +124,8 @@ const config = {
                 href: 'https://www.youtube.com/@DigitallyRefined',
               },
               {
-                label: 'Patreon',
-                href: 'https://patreon.com/DigitallyRefined',
+                label: 'Liberapay',
+                href: 'https://liberapay.com/DigitallyRefined/donate',
               },
               {
                 label: 'GitHub',
