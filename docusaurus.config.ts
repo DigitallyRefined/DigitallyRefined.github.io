@@ -97,16 +97,15 @@ const config: Config = {
           title: 'Community',
           items: [
             {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/PnpA7JYf33',
-            },
-            {
               label: 'Mastodon',
               href: 'https://mastodon.social/@DigitallyRefined',
             },
             {
               label: 'Twitter',
               href: 'https://twitter.com/DigitallyRefine',
+            },
+            {
+              html: `<a href="#" onClick="ygm=['snowy', 'barge', 'swan'].join('-')+'@'+'duck.com';this.href='mailto:'+ygm;this.text=ygm;" class="footer__link-item">Contact me<svg width="13.5" height="13.5" aria-label="(opens in email client)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a>`,
             },
           ],
         },
