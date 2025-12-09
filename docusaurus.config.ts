@@ -139,7 +139,7 @@ const config: Config = {
   scripts: [
     {
       src: 'https://app.tinyanalytics.io/pixel/DgTq8YQ6wysFwYDx',
-      defer: true,
+      async: true,
     },
   ],
 };
