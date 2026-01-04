@@ -99,6 +99,7 @@ const config: Config = {
             {
               label: 'Mastodon',
               href: 'https://mastodon.social/@DigitallyRefined',
+              rel: 'me',
             },
             {
               label: 'Twitter',
