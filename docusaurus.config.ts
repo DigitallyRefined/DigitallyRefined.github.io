@@ -50,6 +50,7 @@ const config: Config = {
           // Remove this to remove the "edit this page" links.
           editUrl:
             'https://github.com/DigitallyRefined/DigitallyRefined.github.io/tree/main/',
+          showLastUpdateTime: true,
           sidebarItemsGenerator: async ({
             defaultSidebarItemsGenerator,
             ...args
