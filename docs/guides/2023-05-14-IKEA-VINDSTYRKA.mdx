@@ -1,6 +1,13 @@
 ---
 sidebar_position: 1
 slug: /guides/IKEA-VINDSTYRKA
+tags:
+  - Reviews
+  - Home Assistant
+  - Smart Home
+  - Hardware
+  - YouTube
+  - Video
 last_update:
   date: 2023-05-15
 ---
@@ -110,8 +117,8 @@ Patches are based off the ["VOC Index" pull request](https://github.com/home-ass
 +++ sensor.py	2023-05-04 09:48:06.726541317 +0100
 @@ -700,6 +700,18 @@
      _attr_native_unit_of_measurement = CONCENTRATION_PARTS_PER_BILLION
- 
- 
+
+
 +@MULTI_MATCH(cluster_handler_names="voc_index", stop_on_match_group="voc_index")
 +class VOCIndex(Sensor):
 +    """VOC Index sensor."""
@@ -144,7 +151,7 @@ Patches are based off the ["VOC Index" pull request](https://github.com/home-ass
    "config_flow": true,
 ```
 
-Once the files have been copied over to your Home Assistant, run the patch script via:   
+Once the files have been copied over to your Home Assistant, run the patch script via:
 `~/share/ikea-vindstyrka/patch-zha-sensor.sh`
 
 Note: each time Home Assistant updates you will need to rerun the script.
