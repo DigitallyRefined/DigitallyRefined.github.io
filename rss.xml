@@ -198,7 +198,7 @@
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="home-assistant-integration">Home Assistant integration<a href="https://digitallyrefined.github.io/guides/IKEA-VINDSTYRKA#home-assistant-integration" class="hash-link" aria-label="Direct link to Home Assistant integration" title="Direct link to Home Assistant integration" translate="no">​</a></h2>
 <p>It's compatible both with the built-in Home Assistant <a href="https://www.home-assistant.io/integrations/zha/" target="_blank" rel="noopener noreferrer" class="">ZHA integration</a> and the <a href="https://github.com/zigbee2mqtt/hassio-zigbee2mqtt#installation" target="_blank" rel="noopener noreferrer" class="">Zigbee2MQTT plug-in</a>.</p>
-<p>This article previously mentioned that the tVOC sensor was not available via ZHA, but it was <a href="https://github.com/zigpy/zha-device-handlers/pull/3801" target="_blank" rel="noopener noreferrer" class="">added in a later release</a>.</p>
+<p>The video and this article previously mentioned that the tVOC sensor was not available via ZHA, but it was <a href="https://github.com/zigpy/zha-device-handlers/pull/3801" target="_blank" rel="noopener noreferrer" class="">added in a later release</a>.</p>
 <p>See also: <a href="https://youtu.be/RWzzNe5gm5s" target="_blank" rel="noopener noreferrer" class="">differences between ZHA and Zigbee2MQTT</a>.</p>]]></content:encoded>
             <category>Reviews</category>
             <category>Home Assistant</category>
