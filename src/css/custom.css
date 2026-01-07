@@ -69,3 +69,18 @@
   --hero-background: #313847;
   --hero-title-background: linear-gradient(to right, #c2858d 10%, #79b1b8 50%);
 }
+
+/* Match blog post widths with docs widths */
+@media (min-width: 997px) {
+  .blog-post-page .row .col.col--3 {
+    max-width: 18%;
+  }
+
+  .blog-post-page .row .col.col--7 {
+    max-width: 65.33333%;
+  }
+
+  .blog-post-page .row .col.col--2 {
+    max-width: 16.66667%;
+  }
+}

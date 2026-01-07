@@ -2,8 +2,6 @@ import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
-import { reverseSidebarItems } from './src/utils/reverseSidebarItems';
-
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
@@ -42,23 +40,19 @@ const config: Config = {
     [
       'classic',
       {
-        docs: {
+        blog: {
           routeBasePath: '/',
-          breadcrumbs: false,
-          sidebarPath: './sidebars.ts',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
             'https://github.com/DigitallyRefined/DigitallyRefined.github.io/tree/main/',
           showLastUpdateTime: true,
-          sidebarItemsGenerator: async ({
-            defaultSidebarItemsGenerator,
-            ...args
-          }) => {
-            const sidebarItems = await defaultSidebarItemsGenerator(args);
-            return reverseSidebarItems(sidebarItems);
+          feedOptions: {
+            type: ['rss', 'atom', 'json'],
+            xslt: true,
           },
         },
+        docs: false,
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -67,6 +61,11 @@ const config: Config = {
   ],
 
   themeConfig: {
+    blog: {
+      sidebar: {
+        groupByYear: false,
+      },
+    },
     // Replace with your project's social card
     image: 'img/DigitallyRefined-banner.jpg',
     colorMode: {
@@ -87,6 +86,11 @@ const config: Config = {
         {
           href: 'https://github.com/DigitallyRefined/DigitallyRefined.github.io',
           label: 'GitHub',
+          position: 'right',
+        },
+        {
+          href: 'pathname:///rss.xml',
+          label: 'RSS',
           position: 'right',
         },
       ],
