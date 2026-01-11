@@ -1,0 +1,4 @@
+This is a Brave Creators publisher verification file.
+
+Domain: digitallyrefined.github.io
+Token: caf4b5fe1bf2f34a583ddce641e4d21290831aba0041f24e62548ea5d9838752
