@@ -1,0 +1,606 @@
+---
+slug: /guides/Containers-Up
+tags:
+  - Tunnelling
+  - Self-hosting
+  - Docker
+  - YouTube
+  - Video
+last_update:
+  date: 2026-01-31
+---
+
+# Containers Up!
+
+[Containers Up!](https://github.com/DigitallyRefined/containers-up) is an open source web-based container management platform designed to simplify the administration of containers across multiple remote hosts.
+
+It provides a unified interface for managing containerized applications, and automating updates with minimal manual intervention.
+
+This guide will step through setting up your own instance of Containers Up! and configuring Dependabot on GitHub or Renovate Bot with Forgejo.
+
+{/* truncate */}
+
+import TOCInline from '@theme/TOCInline';
+
+<TOCInline toc={toc} />
+
+## Video
+
+import LiteYouTubeEmbed from 'react-lite-youtube-embed';
+import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
+
+<LiteYouTubeEmbed
+  id="BXh_dP7b07k"
+  title="Containers Up! - A stable way to manage container updates"
+  poster="maxresdefault"
+  webp
+/>
+
+<a href="https://youtu.be/BXh_dP7b07k">Watch on YouTube</a>
+
+## Installation
+
+### Prerequisites
+
+Before getting started, you'll need:
+
+- A server or mini PC with Docker installed
+- SSH access to your server
+- (Optional) A domain name with HTTPS configured via [Traefik](https://doc.traefik.io/traefik/) or similar reverse proxy ([deSEC](https://desec.io/) is a good way to test HTTPS with free subdomain and wildcard certificates)
+- (Optional) A Git repository (GitHub or Forgejo) for automated updates
+- (Optional) A VPS or tunnelling solution to expose your webhook port securely ([AWS](https://aws.amazon.com/free/) & [Oracle Cloud](https://www.oracle.com/cloud/free/) both have free VPS tiers to test this setup)
+
+### Basic Setup
+
+The simplest way to get started is with the following `compose.yml`:
+
+```yaml
+services:
+  containers-up:
+    # https://github.com/DigitallyRefined/containers-up/releases
+    image: ghcr.io/digitallyrefined/containers-up:1.4.2
+    restart: unless-stopped
+    ports:
+      - 3000:3000 # Main dashboard
+      - 3001:3001 # Webhook port
+    volumes:
+      - ./storage:/storage
+      - ./storage/.ssh:/root/.ssh
+      - ./storage/.docker:/root/.docker
+```
+
+:::info
+See the [Containers Up! GitHub repository](https://github.com/DigitallyRefined/containers-up) for the latest release tag.
+:::
+
+1. Create a directory for Containers Up!: `mkdir containers-up && cd containers-up`
+2. Save the above compose file
+3. Start the service: `docker compose up -d`
+4. Open `http://localhost:3000` in your browser
+
+### Adding Your First Host
+
+#### Creating a separate SSH Key for the app to use
+
+Ideally you should create an SSH key pair specifically for Containers Up! to use:
+
+```bash
+ssh-keygen -t ed25519 -C "containers-up" -f ~/.ssh/containers-up
+```
+
+Then add the public key to your server's `~/.ssh/authorized_keys`:
+
+```bash
+cat ~/.ssh/containers-up.pub | ssh user@yourhost 'cat >> ~/.ssh/authorized_keys'
+```
+
+#### Adding the Host in Containers Up!
+
+When you first access the dashboard, you'll need to add a host:
+
+1. Click **Add Host** in the UI
+2. Fill in the following required fields:
+   - **Name**: A unique identifier (e.g., `my-server`) - lowercase letters, numbers, and hyphens only
+   - **SSH Host**: Your server's SSH connection string in the format `user@hostname` or `user@ip-address`
+   - **SSH Private Key**: Paste your SSH private key (must be in OpenSSH format)
+
+3. **Optional fields** for automation:
+   - **Working Folder**: Path to your compose files on the remote host (e.g., `/home/user/stacks`)
+   - **Repository Host**: Git provider URL (default: `https://github.com`)
+   - **Repository**: Your repo in format `username/repo`
+   - **Bot Type**: Choose `dependabot` (GitHub) or `renovate` (Forgejo)
+   - **Webhook Secret**: Generate a random secret for webhook authentication
+   - **Exclude Folders**: Regex pattern to exclude certain folders (e.g., `(manual|test)`)
+   - **Cron Schedule**: When to check for image updates (e.g., `0 1 * * 6` for Saturdays at 1 AM)
+   - **Squash Updates**: Enable to automatically combine multiple dependency update commits
+
+4. Click **Save** - the system will validate your SSH connection and Docker availability
+
+Once added, you'll see a dashboard showing:
+
+- **Composed Containers**: Services managed via compose files
+- **Individual Containers**: Standalone containers
+- **Images**: All Docker images on the host
+- **Unused Images**: Images that can be cleaned up
+
+<details>
+<summary>**Setup with HTTPS & Authentication (optional, but recommended!)**</summary>
+
+For production deployments with secure HTTPS access and authentication, you can use Traefik as a reverse proxy with Pocket ID for OpenID Connect authentication.
+
+#### Traefik Certificate Resolver Configuration
+
+Before deploying, you'll need to configure Traefik's certificate resolver for automatic HTTPS certificates. Create or update your Traefik configuration file at `./traefik/config/traefik.yml`:
+
+**Setting up deSEC DNS Challenge:**
+
+This example uses [deSEC](https://desec.io/) for a free subdomain and DNS challenge to obtain wildcard certificates, but you can also use other providers such as Cloudflare.
+
+If using the `production-desec-dns` resolver, you'll need to provide your deSEC API token to Traefik:
+
+1. Sign up for a free account at [deSEC.io](https://desec.io/) and create a domain
+2. Generate an API token in your deSEC dashboard
+3. Create a `.env` file in the same directory as your `compose.yml`:
+
+   ```bash
+   # deSEC API Token for Traefik DNS Challenge
+   DESEC_TOKEN=your_desec_api_token_goes_here
+   ```
+
+4. Update your Traefik service in `compose.yml` to use the `.env` file:
+
+   ```yaml
+   traefik:
+     image: traefik:v...
+     # ... other settings ...
+     env_file:
+       - ./.env
+   ```
+
+5. Make sure to add `.env` to your `.gitignore` to avoid committing sensitive tokens
+
+<details>
+<summary>Click to expand Traefik certificate resolver configuration</summary>
+
+```yaml
+certificatesResolvers:
+  # Staging environment (for testing)
+  staging-desec-dns:
+    acme:
+      dnsChallenge:
+        provider: desec
+      email: you@example.com
+      storage: /certs/acme-letsencrypt-staging-desec-dns.json
+      caServer: 'https://acme-staging-v02.api.letsencrypt.org/directory'
+
+  # Production (after making sure staging works, as Let's Encrypt rate limits failed attempts/restarts)
+  production-desec-dns:
+    acme:
+      dnsChallenge:
+        provider: desec
+      email: you@example.com
+      storage: /certs/acme-letsencrypt-production-desec-dns.json
+```
+
+</details>
+
+#### Complete Setup Example
+
+<details>
+<summary>Click to expand complete `compose.yml` with all three services</summary>
+
+```yaml
+services:
+  containers-up:
+    # https://github.com/DigitallyRefined/containers-up/releases
+    image: ghcr.io/digitallyrefined/containers-up:1.4.2
+    restart: unless-stopped
+    volumes:
+      - ./containers-up/storage:/storage
+      - ./containers-up/storage/.ssh:/root/.ssh
+      - ./containers-up/storage/.docker:/root/.docker
+    env_file:
+      - ./.env # Create this file based on .env.default
+    networks:
+      - traefik
+    labels:
+      traefik.enable: true
+
+      # Main dashboard (requires authentication)
+      traefik.http.routers.containers-up.entrypoints: websecure
+      traefik.http.routers.containers-up.rule: Host(`containers-up.example.com`)
+      traefik.http.routers.containers-up.tls: true
+      traefik.http.routers.containers-up.tls.certresolver: production-desec-dns
+      traefik.http.routers.containers-up.service: containers-up
+      traefik.http.services.containers-up.loadbalancer.server.port: 3000
+
+      # Webhook endpoint (public access for GitHub/Forgejo webhooks)
+      traefik.http.routers.containers-up-webhook.entrypoints: websecure
+      traefik.http.routers.containers-up-webhook.rule: Host(`containers-up.example.com`) && PathPrefix(`/api/webhook`)
+      traefik.http.routers.containers-up-webhook.tls: true
+      traefik.http.routers.containers-up-webhook.tls.certresolver: production-desec-dns
+      traefik.http.routers.containers-up-webhook.service: containers-up-webhook
+      traefik.http.services.containers-up-webhook.loadbalancer.server.port: 3001
+
+  pocket-id:
+    # https://github.com/pocket-id/pocket-id/releases
+    image: ghcr.io/pocket-id/pocket-id:v2.2.0
+    restart: unless-stopped
+    volumes:
+      - './pocket-id/data:/app/data'
+    environment:
+      - APP_URL=https://id.example.com
+      - TRUST_PROXY=true
+      - ENCRYPTION_KEY="run `openssl rand -base64 32`" # Generate a unique key
+    networks:
+      - 'traefik'
+    labels:
+      traefik.enable: true
+      traefik.http.routers.pocketid.entrypoints: websecure
+      traefik.http.routers.pocketid.rule: Host(`id.example.com`)
+      traefik.http.routers.pocketid.tls: true
+      traefik.http.routers.pocketid.tls.certresolver: production-desec-dns
+
+  traefik:
+    # https://github.com/traefik/traefik/releases
+    image: traefik:v3.6.7
+    container_name: 'traefik'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./traefik/config:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - 'traefik'
+
+networks:
+  traefik:
+    external: true
+```
+
+</details>
+
+**Notes:**
+
+- Replace `you@example.com` with your actual email address
+- The `production-desec-dns` resolver uses DNS challenge with [deSEC](https://desec.io/) provider (free DNS service with API support)
+- DNS challenge is recommended for wildcard certificates or when port 80 is not accessible
+- The `storage` path must match a volume mounted in your Traefik container (e.g., `./traefik/certs:/certs`)
+
+See the [Traefik ACME documentation](https://doc.traefik.io/traefik/https/acme/) for more certificate resolver options.
+
+#### Setup Steps
+
+1. **Update domains** in the compose file:
+   - Replace `containers-up.example.com` with your Containers Up! domain
+   - Replace `id.example.com` with your Pocket ID domain
+
+2. **Generate encryption key** for Pocket ID:
+
+   ```bash
+   openssl rand -base64 32
+   ```
+
+3. **Create the network and start services**:
+
+   ```bash
+   docker network create traefik
+   docker compose up -d
+   ```
+
+4. **Configure Pocket ID**:
+   - Navigate to your Pocket ID instance (`https://id.example.com`)
+   - Follow the [Pocket ID setup guide](https://pocket-id.org/docs/setup/installation) to create an admin user
+   - Optionally create an admin group and add your user to it
+
+5. **Create OIDC Client in Pocket ID**:
+   - In Pocket ID admin, create a new OIDC client
+   - Set the callback URL to: `https://containers-up.example.com/auth-callback`
+   - Optionally restrict access to the admin group only
+   - Copy the **Client ID** and **Client Secret**
+
+6. **Configure Containers Up! OIDC**:
+
+   Create a `.env` file with the following OIDC configuration:
+
+   ```bash
+   # OpenID Connect Authentication
+   ENV_PUBLIC_OIDC_ISSUER_URI=https://id.example.com
+   ENV_PUBLIC_OIDC_CLIENT_ID=your_client_id_here
+   OIDC_CLIENT_SECRET=your_client_secret_here
+   # OIDC_JWKS_URL=https://id.example.com/.well-known/jwks.json  # Optional: only needed if auto-discovery fails
+   ```
+
+7. **Restart Containers Up!**:
+
+   ```bash
+   docker compose restart containers-up
+   ```
+
+8. **Test authentication**:
+   - Navigate to `https://containers-up.example.com`
+   - You should be redirected to Pocket ID for login
+   - After successful login, you'll be redirected back to Containers Up!
+
+#### Notes
+
+- The **main dashboard** (port 3000) is protected by OIDC authentication
+- The **webhook endpoint** (port 3001) remains publicly accessible but is secured by webhook signature verification
+- Make sure your `.env` file is not committed to Git (add it to `.gitignore`)
+- See the [Pocket ID documentation](https://pocket-id.org) for advanced configuration options
+</details>
+
+### Environment Variables
+
+Optional configuration such as authentication and notifications can be set via a `.env` file:
+
+```yaml
+services:
+  containers-up:
+    image: ghcr.io/digitallyrefined/containers-up:1.4.2
+    # ... other settings ...
+    env_file:
+      - ./.env
+```
+
+See the full list in the [repository's `.env.default`](https://github.com/DigitallyRefined/containers-up/blob/main/.env.default) file.
+
+## Setting Up Automated Updates
+
+One of Containers Up!'s most powerful features is automated container updates via Git-based workflows. This section covers setting up Dependabot (GitHub) or Renovate (Forgejo) to automatically create pull requests when new container images are available.
+
+### Prerequisites for Automation
+
+Before configuring automated updates:
+
+1. Your Containers Up! instance must be **publicly accessible via HTTPS** on port `3001` (webhook port)
+   - You can use [Cloudflare Tunnels](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/), [Pangolin](https://pangolin.net/), [Docker WireGuard Tunnel](https://github.com/DigitallyRefined/docker-wireguard-tunnel), or see [Awesome Tunnelling](https://github.com/anderspitman/awesome-tunneling) for even more options
+
+2. Create a Git repository with your `compose.yml` or `docker-compose.yml` files
+
+3. **Pin all image versions** - replace `:latest` tags with specific versions:
+
+   ```yaml
+   # ❌ Don't use this
+   image: traefik
+
+   # ❌ Or this
+   image: traefik:latest
+
+   # ✅ Use specific versions
+   image: traefik:v3.6.7
+   ```
+
+### Option A: GitHub with Dependabot
+
+#### 1. Enable GitHub Actions
+
+In your repository **Settings > Actions > General**:
+
+- Enable **Allow all actions and reusable workflows**
+- Under **Workflow permissions**, allow **Read and write permissions**
+- Allow **GitHub Actions to create and approve pull requests**
+
+#### 2. Create Dependabot Template
+
+Create `.github/dependabot.template.yml`:
+
+```yaml
+version: 2
+enable-beta-ecosystems: true # Remove once docker-compose updates become stable
+updates:
+  - package-ecosystem: 'docker-compose'
+    directory: '**/docker-compose.yml'
+    schedule:
+      interval: 'weekly'
+      day: 'saturday'
+      time: '01:23'
+      timezone: 'Europe/London' # <-- Change to your timezone
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'saturday'
+      time: '01:23'
+      timezone: 'Europe/London' # <-- Change to your timezone
+```
+
+#### 3. Add GitHub Action to Generate Dependabot Config
+
+Create `.github/workflows/generate_dependabot.yml`:
+
+```yaml
+name: Generate dependabot.yml
+
+on:
+  push:
+    branches:
+      - main
+  repository_dispatch:
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Generate dependabot.yml
+        uses: Makeshift/generate-dependabot-glob-action@master
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8
+```
+
+This workflow will automatically create a managed `.github/dependabot.yml` file that updates as you add new compose files.
+
+#### 4. Configure Webhook in Containers Up!
+
+In the Containers Up! dashboard:
+
+1. Edit your host configuration
+2. Set the **Working Folder** (e.g., `/home/user/stacks`)
+3. Set **Repository** to `username/repo`
+4. Generate a random **Webhook Secret** (e.g., using `openssl rand -hex 32`)
+5. Click the ℹ️ icon to view your webhook URL (will look like: `https://containers-up.example.com/api/webhook/github/host/YOUR_HOST`)
+6. Save the host configuration
+
+#### 5. Configure GitHub Webhook
+
+In your GitHub repository **Settings > Webhooks > Add webhook**:
+
+1. **Payload URL**: Your webhook URL from step 4
+2. **Content type**: `application/json`
+3. **Secret**: The same webhook secret from Containers Up!
+4. **Events**: Select **Let me select individual events** and choose **Pull requests**
+5. Click **Add webhook**
+
+Test it by clicking the webhook and selecting **Recent Deliveries > Redeliver**. You should see a "ping" event in the Containers Up! logs.
+
+### Option B: Forgejo with Renovate Bot
+
+#### 1. Create Access Tokens
+
+In Forgejo **Settings > Application**:
+
+1. Create an **Access Token** with the permissions listed in the [Renovate Forgejo docs](https://docs.renovatebot.com/modules/platform/forgejo/)
+2. In **Actions > Secrets**:
+   - Create `ACTIONS_TOKEN` with your Forgejo token
+   - Create `EXTERNAL_GITHUB_TOKEN` with a GitHub Personal Access Token (for fetching changelogs)
+
+#### 2. Create Renovate Workflow
+
+<details>
+<summary>Click to expand `.forgejo/workflows/renovate.yml`</summary>
+
+```yaml
+name: Renovate
+
+on:
+  push:
+    branches:
+      - main
+      - 'renovate/**'
+  schedule:
+    # At 02:00, only on Saturday
+    - cron: '0 2 * * 6'
+  issues:
+    types:
+      - edited
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  renovate:
+    runs-on: docker
+    container:
+      image: renovate/renovate:43.0.6
+
+    steps:
+      - name: Restore Renovate Cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/renovate-cache
+          key: renovate-cache-${{ runner.os }}
+          restore-keys: |
+            renovate-cache-
+
+      - name: Set Git identity
+        run: |
+          git config --global user.name "Renovate Bot"
+          git config --global user.email "renovate@localhost"
+
+      - name: Run Renovate
+        env:
+          LOG_LEVEL: info
+          RENOVATE_PLATFORM: forgejo
+          RENOVATE_ENDPOINT: ${{ github.api_url }} # GitHub variables still work in Forgejo
+          RENOVATE_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          RENOVATE_GITHUB_COM_TOKEN: ${{ secrets.EXTERNAL_GITHUB_TOKEN }}
+          RENOVATE_CACHE_DIR: ${{ github.workspace }}/renovate-cache
+        run: renovate
+```
+
+</details>
+
+#### 3. Configure Webhook in Containers Up!
+
+Similar to GitHub setup:
+
+1. Edit your host, set **Bot Type** to `renovate`
+2. Set **Working Folder**, **Repository** (`username/repo`)
+3. Set **Repository Host** to your Forgejo URL (e.g., `https://git.example.com`)
+4. Generate a **Webhook Secret**
+5. Note the webhook URL (will include `/forgejo/` in the path)
+
+#### 4. Configure Forgejo Webhook
+
+In your Forgejo repository **Settings > Webhooks > Add Forgejo webhook**:
+
+1. **Target URL**: Your webhook URL
+2. **HTTP Method**: `POST`
+3. **Content Type**: `application/json`
+4. **Secret**: Your webhook secret
+5. **Trigger On**: **Custom events > Pull request modifications**
+
+### How It Works
+
+Once configured, the workflow is:
+
+1. **Dependabot/Renovate** scans your compose files weekly (or on your schedule)
+2. When a new image version is found, a **Pull Request** is created
+3. The PR triggers a **webhook** to Containers Up!
+4. Containers Up! displays the update in the dashboard with a notification
+5. You **review the changelog** and decide whether to merge
+6. When merged, another webhook triggers Containers Up! to:
+   - Pull the updated compose file from Git
+   - Pull the new Docker image
+   - Restart the containers with the new image
+
+### Optional: Commit Squashing
+
+If you enable **Squash Updates** in your host configuration, Containers Up! will automatically combine multiple dependency update commits to keep your Git history clean. This is useful when multiple PRs are merged in quick succession.
+
+The squashing behavior can be customised with environment variables:
+
+- `SQUASH_UPDATE_MESSAGE`: Commit message prefix (default: `Update dependencies`)
+- `SQUASH_DAYS_AGO`: Number of days before considering a commit too old to squash with newer dependency updates (default: `5` days)
+- `SQUASH_MAX_UPDATE_COMMITS`: Maximum number of dependency update commits to keep before squashing the oldest two together (default: `5`)
+
+## Additional resources
+
+<LiteYouTubeEmbed
+  id="c8f-YPiUBZM"
+  title="Self-hosted Cloudflare + VPN replacement! Pangolin Tutorial"
+  poster="maxresdefault"
+  webp
+/>
+
+- <a href="https://youtu.be/c8f-YPiUBZM">
+    Self-hosted Cloudflare + VPN replacement! Pangolin Tutorial
+  </a>
+
+<LiteYouTubeEmbed
+  id="GKyMXguNcos"
+  title="DITCH PASSWORDS: Self-Host PassKeys with Pocket ID"
+  poster="maxresdefault"
+  webp
+/>
+
+- <a href="https://youtu.be/GKyMXguNcos">
+    DITCH PASSWORDS: Self-Host PassKeys with Pocket ID
+  </a>
+
+<LiteYouTubeEmbed
+  id="-hfejNXqOzA"
+  title="Simple HTTPs for Docker! // Traefik Tutorial (updated)"
+  poster="maxresdefault"
+  webp
+/>
+
+- <a href="https://youtu.be/-hfejNXqOzA">
+    Simple HTTPs for Docker! // Traefik Tutorial (updated)
+  </a>
