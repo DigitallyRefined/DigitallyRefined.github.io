@@ -7,7 +7,7 @@ tags:
   - YouTube
   - Video
 last_update:
-  date: 2026-01-31
+  date: 2026-02-01
 ---
 
 # Containers Up!
@@ -169,6 +169,8 @@ certificatesResolvers:
     acme:
       dnsChallenge:
         provider: desec
+      propagation:
+        delayBeforeChecks: 240
       email: you@example.com
       storage: /certs/acme-letsencrypt-staging-desec-dns.json
       caServer: 'https://acme-staging-v02.api.letsencrypt.org/directory'
@@ -178,6 +180,8 @@ certificatesResolvers:
     acme:
       dnsChallenge:
         provider: desec
+      propagation:
+        delayBeforeChecks: 240
       email: you@example.com
       storage: /certs/acme-letsencrypt-production-desec-dns.json
 ```
@@ -249,6 +253,8 @@ services:
     ports:
       - '80:80'
       - '443:443'
+    environment:
+      - LEGO_DISABLE_CNAME_SUPPORT=true
     volumes:
       - ./traefik/config:/etc/traefik
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -259,6 +265,12 @@ networks:
   traefik:
     external: true
 ```
+
+:::info
+It can take take around 5 minutes for certificates to be issued, keep the service running monitoring `docker compose logs -f` and check in the `certs` folder, as there will be a new section added to the JSON files under `PrivateKey` with a `Certificates` section once issued.
+
+When first starting Traefik, it's recommended to use the `staging-desec-dns` resolver to avoid hitting Let's Encrypt rate limits while testing your setup. Once confirmed working, switch to `production-desec-dns`.
+:::
 
 </details>
 
