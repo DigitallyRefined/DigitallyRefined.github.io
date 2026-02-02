@@ -7,7 +7,7 @@ tags:
   - YouTube
   - Video
 last_update:
-  date: 2026-02-01
+  date: 2026-02-02
 ---
 
 # Containers Up!
@@ -212,7 +212,7 @@ services:
 
       # Main dashboard (requires authentication)
       traefik.http.routers.containers-up.entrypoints: websecure
-      traefik.http.routers.containers-up.rule: Host(`containers-up.example.com`)
+      traefik.http.routers.containers-up.rule: Host(`containers-up.example.dedyn.io`)
       traefik.http.routers.containers-up.tls: true
       traefik.http.routers.containers-up.tls.certresolver: production-desec-dns
       traefik.http.routers.containers-up.service: containers-up
@@ -220,7 +220,7 @@ services:
 
       # Webhook endpoint (public access for GitHub/Forgejo webhooks)
       traefik.http.routers.containers-up-webhook.entrypoints: websecure
-      traefik.http.routers.containers-up-webhook.rule: Host(`containers-up.example.com`) && PathPrefix(`/api/webhook`)
+      traefik.http.routers.containers-up-webhook.rule: Host(`containers-up.example.dedyn.io`) && PathPrefix(`/api/webhook`)
       traefik.http.routers.containers-up-webhook.tls: true
       traefik.http.routers.containers-up-webhook.tls.certresolver: production-desec-dns
       traefik.http.routers.containers-up-webhook.service: containers-up-webhook
@@ -233,7 +233,7 @@ services:
     volumes:
       - './pocket-id/data:/app/data'
     environment:
-      - APP_URL=https://id.example.com
+      - APP_URL=https://id.example.dedyn.io
       - TRUST_PROXY=true
       - ENCRYPTION_KEY="run `openssl rand -base64 32`" # Generate a unique key
     networks:
@@ -241,7 +241,7 @@ services:
     labels:
       traefik.enable: true
       traefik.http.routers.pocketid.entrypoints: websecure
-      traefik.http.routers.pocketid.rule: Host(`id.example.com`)
+      traefik.http.routers.pocketid.rule: Host(`id.example.dedyn.io`)
       traefik.http.routers.pocketid.tls: true
       traefik.http.routers.pocketid.tls.certresolver: production-desec-dns
 
@@ -286,8 +286,8 @@ See the [Traefik ACME documentation](https://doc.traefik.io/traefik/https/acme/)
 #### Setup Steps
 
 1. **Update domains** in the compose file:
-   - Replace `containers-up.example.com` with your Containers Up! domain
-   - Replace `id.example.com` with your Pocket ID domain
+   - Replace `containers-up.example.dedyn.io` with your Containers Up! domain
+   - Replace `id.example.dedyn.io` with your Pocket ID domain
 
 2. **Generate encryption key** for Pocket ID:
 
@@ -303,13 +303,13 @@ See the [Traefik ACME documentation](https://doc.traefik.io/traefik/https/acme/)
    ```
 
 4. **Configure Pocket ID**:
-   - Navigate to your Pocket ID instance (`https://id.example.com`)
+   - Navigate to your Pocket ID instance (`https://id.example.dedyn.io`)
    - Follow the [Pocket ID setup guide](https://pocket-id.org/docs/setup/installation) to create an admin user
    - Optionally create an admin group and add your user to it
 
 5. **Create OIDC Client in Pocket ID**:
    - In Pocket ID admin, create a new OIDC client
-   - Set the callback URL to: `https://containers-up.example.com/auth-callback`
+   - Set the callback URL to: `https://containers-up.example.dedyn.io/auth-callback`
    - Optionally restrict access to the admin group only
    - Copy the **Client ID** and **Client Secret**
 
@@ -319,10 +319,10 @@ See the [Traefik ACME documentation](https://doc.traefik.io/traefik/https/acme/)
 
    ```bash
    # OpenID Connect Authentication
-   ENV_PUBLIC_OIDC_ISSUER_URI=https://id.example.com
+   ENV_PUBLIC_OIDC_ISSUER_URI=https://id.example.dedyn.io
    ENV_PUBLIC_OIDC_CLIENT_ID=your_client_id_here
    OIDC_CLIENT_SECRET=your_client_secret_here
-   # OIDC_JWKS_URL=https://id.example.com/.well-known/jwks.json  # Optional: only needed if auto-discovery fails
+   # OIDC_JWKS_URL=https://id.example.dedyn.io/.well-known/jwks.json  # Optional: only needed if auto-discovery fails
    ```
 
 7. **Restart Containers Up!**:
@@ -332,7 +332,7 @@ See the [Traefik ACME documentation](https://doc.traefik.io/traefik/https/acme/)
    ```
 
 8. **Test authentication**:
-   - Navigate to `https://containers-up.example.com`
+   - Navigate to `https://containers-up.example.dedyn.io`
    - You should be redirected to Pocket ID for login
    - After successful login, you'll be redirected back to Containers Up!
 
@@ -457,7 +457,7 @@ In the Containers Up! dashboard:
 2. Set the **Working Folder** (e.g., `/home/user/stacks`)
 3. Set **Repository** to `username/repo`
 4. Generate a random **Webhook Secret** (e.g., using `openssl rand -hex 32`)
-5. Click the ℹ️ icon to view your webhook URL (will look like: `https://containers-up.example.com/api/webhook/github/host/YOUR_HOST`)
+5. Click the ℹ️ icon to view your webhook URL (will look like: `https://containers-up.example.dedyn.io/api/webhook/github/host/YOUR_HOST`)
 6. Save the host configuration
 
 #### 5. Configure GitHub Webhook
@@ -544,7 +544,7 @@ Similar to GitHub setup:
 
 1. Edit your host, set **Bot Type** to `renovate`
 2. Set **Working Folder**, **Repository** (`username/repo`)
-3. Set **Repository Host** to your Forgejo URL (e.g., `https://git.example.com`)
+3. Set **Repository Host** to your Forgejo URL (e.g., `https://git.example.dedyn.io`)
 4. Generate a **Webhook Secret**
 5. Note the webhook URL (will include `/forgejo/` in the path)
 
