@@ -11,7 +11,7 @@
 
 
 <script src="https://app.tinyanalytics.io/pixel/DgTq8YQ6wysFwYDx" async></script><link rel="stylesheet" href="/assets/css/styles.f47d2d3b.css">
-<script src="/assets/js/runtime~main.f5287557.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.ae05e396.js" defer="defer"></script>
 <script src="/assets/js/main.e17c963f.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -24,7 +24,7 @@
 <strong>Proxmox Host</strong> → <strong>Unprivileged LXC</strong> → <strong>Rootless Docker/Podman</strong> → <strong>Docker in Docker (DinD)</strong>.</p>
 <!-- -->
 <p>Running Docker or Podman as root can be a bit of a security risk, especially as we&#x27;ve seen quite an increase in malware such as the <a href="https://www.microsoft.com/en-us/security/blog/2025/12/09/shai-hulud-2-0-guidance-for-detecting-investigating-and-defending-against-the-supply-chain-attack/" target="_blank" rel="noopener noreferrer" class="">Shai-Hulud worm</a> and AI tools like <a href="https://github.com/openclaw/openclaw" target="_blank" rel="noopener noreferrer" class="">OpenClaw</a> gaining full access to your machine.</p>
-<p>Running containers in an unprivileged LXC containers with rootless Docker/Podman adds an extra layer of security and reduces the blast radius, as even if a container is compromised, the attacker would still be limited by the unprivileged LXC container&#x27;s and standard/non-admin user restrictions.</p>
+<p>Running containers in an unprivileged LXC containers with rootless Docker/Podman adds an extra layer of security and reduces the blast radius, as even if a container is compromised, the attacker would still be limited by the unprivileged LXC and standard/non-admin user restrictions.</p>
 <!-- -->
 <div class="tableOfContentsInline_prmo"><ul class="table-of-contents"><li><a href="#installation">Installation</a></li><li><a href="#video-transcoding">Video transcoding</a></li><li><a href="#forgejo-actions-via-docker-in-docker-dind">Forgejo Actions via Docker in Docker (DinD)</a></li><li><a href="#additional-resources">Additional resources</a></li></ul></div>
 <!-- -->
