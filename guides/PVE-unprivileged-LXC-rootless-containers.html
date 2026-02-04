@@ -11,7 +11,7 @@
 
 
 <script src="https://app.tinyanalytics.io/pixel/DgTq8YQ6wysFwYDx" async></script><link rel="stylesheet" href="/assets/css/styles.f47d2d3b.css">
-<script src="/assets/js/runtime~main.b13342ae.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.d5abd868.js" defer="defer"></script>
 <script src="/assets/js/main.e17c963f.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -25,7 +25,8 @@
 <!-- -->
 <p>Running Docker or Podman as root can be a bit of a security risk, especially as we&#x27;ve seen quite an increase in malware such as the <a href="https://www.microsoft.com/en-us/security/blog/2025/12/09/shai-hulud-2-0-guidance-for-detecting-investigating-and-defending-against-the-supply-chain-attack/" target="_blank" rel="noopener noreferrer" class="">Shai-Hulud worm</a> and AI tools like <a href="https://github.com/openclaw/openclaw" target="_blank" rel="noopener noreferrer" class="">OpenClaw</a> gaining full access to your machine.</p>
 <p>Running containers in an unprivileged LXC containers with rootless Docker/Podman adds an extra layer of security and reduces the blast radius, as even if a container is compromised, the attacker would still be limited by the unprivileged LXC and standard/non-admin user restrictions.</p>
-<p>Even using the standard (rootful) Docker install and handing off the process to a standard user by adding the user to the <code>docker</code> group, still leaves a large attack surface, as the Docker daemon itself runs as root and can be exploited to gain root access to the host. I&#x27;ve had first hand experience of this while making changes to my only standard user account which had sudo privileges by making a typo in the <code>sudoers</code> file I managed to lock myself out of the system, luckily for me I remembered that Docker runs as root and I was able to use a Docker to mount the affected <code>sudoers</code> config file in a container and fix it, which I should not be able to do.</p>
+<p>Even using the standard (rootful) Docker install and handing off the process to a standard user by adding the user to the <code>docker</code> group, still leaves a large attack surface, as the Docker daemon itself runs as root and can be exploited to gain root access to the host.</p>
+<p>I&#x27;ve had first hand experience of this while making changes to my only standard user account which had sudo privileges by making a typo in the <code>sudoers</code> file I managed to lock myself out of the system, luckily for me I remembered that Docker runs as root and I was able to use a Docker to mount the affected <code>sudoers</code> config file in a container and fix it, which I should not be able to do.</p>
 <!-- -->
 <div class="tableOfContentsInline_prmo"><ul class="table-of-contents"><li><a href="#installation">Installation</a></li><li><a href="#video-transcoding">Video transcoding</a></li><li><a href="#forgejo-actions-via-docker-in-docker-dind">Forgejo Actions via Docker in Docker (DinD)</a></li><li><a href="#additional-resources">Additional resources</a></li></ul></div>
 <!-- -->
