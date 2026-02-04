@@ -1,0 +1,458 @@
+---
+slug: /guides/PVE-unprivileged-LXC-rootless-containers
+tags:
+  - Proxmox
+  - LXC
+  - Self-hosting
+  - Docker
+  - YouTube
+  - Video
+last_update:
+  date: 2026-02-04
+---
+
+# Proxmox Unprivileged LXC Rootless Docker/Podman
+
+By default Proxmox Unprivileged LXC containers only allow running Docker/Podman as `root`. In this guide we will set up rootless Docker inside an unprivileged LXC container.
+
+Allowing nesting namespaces three levels deep:<br/>
+**Proxmox Host** → **Unprivileged LXC** → **Rootless Docker/Podman** → **Docker in Docker (DinD)**.
+
+{/* truncate */}
+
+Running Docker or Podman as root can be a bit of a security risk, especially as we've seen quite an increase in malware such as the [Shai-Hulud worm](https://www.microsoft.com/en-us/security/blog/2025/12/09/shai-hulud-2-0-guidance-for-detecting-investigating-and-defending-against-the-supply-chain-attack/) and AI tools like [OpenClaw](https://github.com/openclaw/openclaw) gaining full access to your machine.
+
+Running containers in an unprivileged LXC containers with rootless Docker/Podman adds an extra layer of security and reduces the blast radius, as even if a container is compromised, the attacker would still be limited by the unprivileged LXC and standard/non-admin user restrictions.
+
+Even using the standard (rootful) Docker install and handing off the process to a standard user by adding the user to the `docker` group, still leaves a large attack surface, as the Docker daemon itself runs as root and can be exploited to gain root access to the host.
+
+I've had first hand experience of this while making changes to my only standard user account which had sudo privileges by making a typo in the `sudoers` file I managed to lock myself out of the system, luckily for me I remembered that Docker runs as root and I was able to use a Docker to mount the affected `sudoers` config file in a container and fix it, which I should not be able to do.
+
+import TOCInline from '@theme/TOCInline';
+
+<TOCInline toc={toc} />
+
+## Installation
+
+After creating an unprivileged LXC container, first we'll need to navigate to our Proxmox dashboard and open up a console on the host.
+
+Now we can run the [PVE LXC Unprivileged Rootless Docker script](https://gist.github.com/DigitallyRefined/37dfcc68a146c59e2215c2b5b5fabecc):
+
+```bash
+bash -c "$(curl -fsSL https://gist.githubusercontent.com/DigitallyRefined/37dfcc68a146c59e2215c2b5b5fabecc/raw/pve-unprivileged-lxc-rootless-containers.sh)"
+```
+
+:::warning
+Please [review the script](https://gist.github.com/DigitallyRefined/37dfcc68a146c59e2215c2b5b5fabecc) before running it before running it on your system.
+
+This script has been tested with a Debian 13 LXC on Proxmox 9.1.
+:::
+
+Review the list of LXC containers and confirm that you want to continue, select `Yes` on the GPU prompt and select the LXC container we created earlier from the list, once you confirm the script will run through the LXC containers adjusting the namespaces that we can use containers and container nesting (Docker in Docker) via non-root users.
+
+Once the script finishes updating the namespace, we need to SSH into the LXC container as root and install Docker and the `uidmap` package and create a non-root user to run rootless Docker:
+
+```bash
+ssh root@192.168...
+
+wget -qO get-docker.sh https://get.docker.com
+sh get-docker.sh
+
+apt install -y uidmap
+
+adduser user
+
+exit
+```
+
+Now that we have Docker installed, we can SSH into the container as the non-root user we created (`test` in this case) and set up rootless Docker and test that it works correctly:
+
+```bash
+ssh user@192.168...
+
+dockerd-rootless-setuptool.sh install
+
+docker run --rm hello-world
+```
+
+If this works correctly, you should see a "Hello from Docker!" message confirming that rootless Docker is working inside the unprivileged LXC container.
+
+Now that we've confirmed rootless Docker is working, we can allow the Docker service to start on boot for the non-root user and disable the root Docker service:
+
+```bash
+ssh root@192.168...
+loginctl enable-linger user # replace 'user' with your non-root username
+
+systemctl stop docker.service docker.socket
+systemctl disable docker.service docker.socket
+systemctl stop containerd.service
+systemctl disable containerd.service
+```
+
+## Video transcoding
+
+Now we have rootless Docker set up and working, we can try running a more complex container that uses hardware acceleration. In this example we'll use the `linuxserver/ffmpeg` container to generate a test video via the GPU using Intel Quick Sync Video (QSV) hardware acceleration:
+
+:::note
+This example assumes that your Proxmox host has an Intel CPU with integrated graphics (with Quick Sync video support) and that you select GPU passthrough in the previous step. If you're using a different GPU (e.g., NVIDIA or AMD), you'll need to adjust the device mapping and ffmpeg parameters accordingly.
+:::
+
+```bash
+docker run --rm -it \
+  --device /dev/dri:/dev/dri \
+  -v $(pwd):/data \
+  linuxserver/ffmpeg \
+  -y \
+  -f lavfi -i testsrc=duration=5:size=1280x720:rate=30 \
+  -f lavfi -i sine=frequency=1000:duration=5 \
+  -c:v h264_qsv -preset fast -b:v 2M \
+  -c:a aac -b:a 128k \
+  -shortest /data/output.mp4
+
+ls -lh output.mp4
+```
+
+If everything is set up correctly, you should see the output video file generated in the current directory, copying this back your computer should show that it created a 5 second [test card](https://en.wikipedia.org/wiki/Test_card) video with both video and audio streams.
+
+This quick test shows that rootless Docker is able to access the GPU hardware acceleration from within an unprivileged LXC container and running Jellyfin or Plex should also run correctly.
+
+## Forgejo Actions via Docker in Docker (DinD)
+
+Another benefit of using this script allowing unprivileged LXC rootless Docker is that we can now run Docker in Docker (DinD). This allows us to run CI/CD runners such as Forgejo Actions or GitHub Actions runners that can build and run Docker containers as part of their workflows.
+
+<details>
+<summary>Click to expand Git/SSH setup instructions</summary>
+
+**As root on the LXC**
+
+```bash
+ssh root@192.168...
+apt install acl
+useradd --system --create-home git
+```
+`/etc/ssh/sshd_config`
+```ini
+Match User git
+    AuthorizedKeysCommandUser user # <-- replace with non-root user created earlier
+    AuthorizedKeysCommand /usr/local/bin/forgejo-authorized-keys.sh %u %t %k
+```
+`/usr/local/bin/forgejo-authorized-keys.sh`
+```bash
+#!/bin/bash
+set -e
+
+/usr/bin/docker exec -i -u git forgejo \
+  /usr/local/bin/forgejo keys \
+  --config /var/lib/gitea/custom/conf/app.ini \
+  -e git \
+  -u "$1" \
+  -t "$2" \
+  -k "$3"
+```
+```bash
+chmod +x /usr/local/bin/forgejo-authorized-keys.sh
+systemctl restart sshd
+```
+
+**As non-root user on the LXC**
+
+```bash
+ssh user@192.168...
+systemctl --user edit docker
+```
+```ini
+[Service]
+ExecStartPost=/usr/bin/setfacl -m u:git:rw %t/docker.sock
+ExecStartPost=/usr/bin/chmod +x %t
+```
+```bash
+systemctl --user daemon-reload
+systemctl --user restart docker
+```
+
+</details>
+
+<details>
+<summary>Click to expand Traefik setup instructions</summary>
+
+**As root on the LXC:**
+
+`/etc/sysctl.d/99-custom.conf`
+```conf
+net.ipv4.ping_group_range = 0 165535
+net.ipv4.ip_unprivileged_port_start = 80
+```
+```bash
+reboot
+```
+
+**As non-root user on the LXC:**
+
+`traefik/docker-compose.yml`
+```yaml
+services:
+  traefik:
+    # Check migration guide first: https://doc.traefik.io/traefik/v3.6/migrate/v3/
+    # https://github.com/traefik/traefik/releases
+    image: docker.io/traefik:v3.6.7
+    container_name: 'traefik'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      # (Optional) Expose Dashboard
+      # - '8080:8080' # Don't do this in production!
+    volumes:
+      - ./data/config:/etc/traefik:ro
+      - ./data/certs:/certs
+      - ./data/plugins:/plugins-local:ro
+      - ${XDG_RUNTIME_DIR}/docker.sock:/var/run/docker.sock:ro
+    init: true
+    healthcheck:
+      test: wget --quiet --tries=1 --spider http://127.0.0.1/ping || bash -c 'kill -s 15 -1 && (sleep 10; kill -s 9 -1)'
+      interval: 30s
+      timeout: 60s
+      retries: 3
+      start_period: 10s
+    environment:
+      - LEGO_DISABLE_CNAME_SUPPORT=true
+    env_file:
+      - .env
+    networks:
+      - 'traefik'
+    labels:
+      traefik.enable: true
+
+      traefik.http.routers.traefik-ping.rule: Host(`127.0.0.1`) && Path(`/ping`)
+      traefik.http.routers.traefik-ping.entrypoints: web
+      # Override HTTPS redirect
+      traefik.http.routers.traefik-ping.priority: 2000
+
+networks:
+  traefik:
+    external: true
+```
+
+`traefik/.env`
+```env
+DESEC_TOKEN= # Add your deSEC API token
+```
+
+This example uses deSEC as the provider for Let's Encrypt DNS challenges, you can register for a free subdomain and get an API token from your [deSEC account](https://desec.io/) or bring your own domain.
+
+`traefik/config/traefik.yml`
+```yaml
+entryPoints:
+  web:
+    address: :80
+    # (Optional) Redirect to HTTPS
+    # ---
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          priority: 1000
+
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: production-desec-dns
+        domains:
+          - main: "example.dedyn.io"
+            sans:
+              - "*.example.dedyn.io"
+
+ping:
+  entryPoint: web
+
+certificatesResolvers:
+  # Staging environment (for testing)
+  staging-desec-dns:
+    acme:
+      dnsChallenge:
+        provider: desec
+        propagation:
+          delayBeforeChecks: 240
+      email: you@example.com
+      storage: /certs/acme-letsencrypt-staging-desec-dns.json
+      caServer: 'https://acme-staging-v02.api.letsencrypt.org/directory'
+
+  # Production (after making sure staging works, as Let's Encrypt rate limits failed attempts/restarts)
+  production-desec-dns:
+    acme:
+      dnsChallenge:
+        provider: desec
+        propagation:
+          delayBeforeChecks: 240
+      email: you@example.com
+      storage: /certs/acme-letsencrypt-production-desec-dns.json
+
+providers:
+  docker:
+    exposedByDefault: false  # Default is true
+```
+</details>
+
+<details>
+<summary>Click to expand Forgejo Actions via DinD setup instructions</summary>
+
+```bash
+ssh user@192.168...
+mkdir -p forgejo/runner
+cd forgejo
+mkdir -p ./data/var/lib/gitea ./data/etc/gitea ./data/etc/act_runner
+sudo chown -R 100999:100999 data
+```
+
+`forgejo/docker-compose.yml`
+```yaml
+services:
+  forgejo:
+    # https://codeberg.org/forgejo/forgejo/releases
+    image: codeberg.org/forgejo/forgejo:14.0.1-rootless
+    container_name: forgejo
+    restart: unless-stopped
+    user: 1000:1000
+    # ports:
+    #   - '3000:3000'
+    #   - '222:2222'
+    volumes:
+      - ./data/var/lib/gitea:/var/lib/gitea
+      - ./data/etc/gitea:/etc/gitea
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - FORGEJO__actions__ENABLED=true
+      - FORGEJO__webhook__ALLOWED_HOST_LIST=private,100.64.0.0/10
+      - FORGEJO__repository.pull-request__DEFAULT_MERGE_STYLE=squash
+      - FORGEJO__repository__USE_COMPAT_SSH_URI=false
+      - FORGEJO__server__START_SSH_SERVER=false
+      - FORGEJO__server__SSH_PORT=22
+      - FORGEJO__server__SSH_AUTHORIZED_KEYS_COMMAND_TEMPLATE=/usr/bin/docker -H unix://${XDG_RUNTIME_DIR}/docker.sock exec -i -e SSH_ORIGINAL_COMMAND -u git forgejo {{.AppPath}} --config={{.CustomConf}} serv key-{{.Key.ID}}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 5s
+      retries: 10
+      timeout: 5s
+    networks:
+      - "traefik"
+    labels:
+      traefik.enable: true
+      traefik.http.routers.forgejo.entrypoints: web,websecure
+      traefik.http.routers.forgejo.rule: Host(`forgejo.example.dedyn.io`)
+      traefik.http.routers.forgejo.tls: true
+      traefik.http.routers.forgejo.tls.certresolver: production-desec-dns
+      traefik.http.services.forgejo.loadbalancer.server.port: 3000
+
+  dind:
+    # https://github.com/moby/moby/releases
+    image: docker:29.1.5-dind
+    container_name: dind
+    restart: unless-stopped
+    privileged: true            # DinD requires privileged (within rootless Docker)
+    ports:
+      - "2375:2375"
+    environment:
+      DOCKER_TLS_CERTDIR: ""    # disable TLS for simplicity internal only
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    volumes:
+      - dind-data:/var/lib/docker
+    networks:
+      - "traefik"
+
+  runner:
+    # https://code.forgejo.org/forgejo/runner/releases
+    image: data.forgejo.org/forgejo/runner:12.6.2
+    container_name: forgejo-runner
+    restart: unless-stopped
+    depends_on:
+      forgejo:
+        condition: service_healthy
+      dind:
+        condition: service_healthy
+    environment:
+      # Point runner to the DinD daemon
+      DOCKER_HOST: tcp://dind:2375
+    env_file:
+      - ./.env-runner
+    volumes:
+      - runner-data:/data
+      - ./data/etc/act_runner:/etc/act_runner
+      - ./runner/config.yaml:/etc/act_runner/config.yaml
+    networks:
+      - "traefik"
+    command:
+      - bash
+      - -c
+      - |
+        if [ ! -f /etc/act_runner/.runner ]; then
+          pushd /etc/act_runner
+          forgejo-runner register --no-interactive \
+            --instance https://forgejo.example.dedyn.io \
+            --name dind-runner \
+            --labels docker \
+            --token "$$FORGEJO_RUNNER_REGISTRATION_TOKEN"
+          popd
+        fi
+        ln -sf /etc/act_runner/.runner .
+        forgejo-runner --config /etc/act_runner/config.yaml daemon
+
+volumes:
+  runner-data:
+  dind-data:
+
+networks:
+  traefik:
+    external: true
+```
+
+`forgejo/runner/config.yaml`
+```yaml
+runner:
+  envs:
+    DOCKER_HOST: tcp://forgejo.example.dedyn.io:2375 # <- replace with your LXC hostname
+```
+
+`forgejo/.env-runner`
+```bash
+FORGEJO_RUNNER_REGISTRATION_TOKEN= # Add your Forgejo Actions runner registration token
+```
+
+</details>
+
+Once the files are in place, we can start the Forgejo, Actions, DinD and Traefik services:
+
+```bash
+docker network create traefik
+docker compose -f traefik/docker-compose.yml up -d
+docker compose -f forgejo/docker-compose.yml up -d
+```
+
+:::info
+It can take take around 5 minutes for HTTPS/TLS certificates to be issued, keep the service running monitoring `docker compose -f traefik/docker-compose.yml logs -f` and check in the `certs` folder, as there will be a new section added to the JSON files under `PrivateKey` with a `Certificates` section once issued.
+
+When first starting Traefik, it's recommended to use the `staging-desec-dns` resolver to avoid hitting Let's Encrypt rate limits while testing your setup. Once confirmed working, switch to `production-desec-dns`.
+:::
+
+Once Traefik and Forgejo are up and running, you should be able to navigate to your Forgejo instance using the URL you set earlier, e.g. `https://forgejo.example.dedyn.io`, and follow the installation wizard.
+
+After setting up your Forgejo instance, navigate to **Site administration** → **Actions** → **Runners** to create a new Action runner and copy the registration token into the `FORGEJO_RUNNER_REGISTRATION_TOKEN` variable in the `forgejo/.env-runner` file and use `docker compose -f forgejo/docker-compose.yml up -d --force-recreate` to pickup the new token and start the runner.
+
+Create a new Access token from **Applications** in your Forgejo account settings, with `issue`, `misc`, `organization`, `package`, and `repository` permissions and add it as a secret named `ACTIONS_TOKEN` under **Actions** → **Secrets**.
+
+Now workflows that use Docker will be able to run inside the unprivileged LXC container using rootless Docker in Docker (DinD).
+
+## Additional resources
+
+- [PVE LXC Unprivileged Rootless Docker - pve-unprivileged-lxc-rootless-containers.sh](https://gist.github.com/DigitallyRefined/37dfcc68a146c59e2215c2b5b5fabecc)
+- [Docker Rootless Mode](https://docs.docker.com/engine/security/rootless/)
+- [Docker in Docker (DinD)](https://www.docker.com/resources/docker-in-docker-containerized-ci-workflows-dockercon-2023/)
+- [Proxmox Unprivileged LXC Containers](https://pve.proxmox.com/wiki/Unprivileged_LXC_containers)
