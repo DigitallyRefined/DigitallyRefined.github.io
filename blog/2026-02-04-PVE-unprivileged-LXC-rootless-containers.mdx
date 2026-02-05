@@ -5,15 +5,13 @@ tags:
   - LXC
   - Self-hosting
   - Docker
-  - YouTube
-  - Video
 last_update:
-  date: 2026-02-04
+  date: 2026-02-05
 ---
 
-# Proxmox Unprivileged LXC Rootless Docker/Podman
+# Running rootless Docker on a Proxmox unprivileged LXC
 
-By default Proxmox Unprivileged LXC containers only allow running Docker/Podman as `root`. In this guide we will set up rootless Docker inside an unprivileged LXC container.
+By default Proxmox unprivileged LXC containers only allow running Docker/Podman as `root`. In this guide we will set up rootless Docker inside an unprivileged LXC container.
 
 Allowing nesting namespaces three levels deep:<br/>
 **Proxmox Host** → **Unprivileged LXC** → **Rootless Docker/Podman** → **Docker in Docker (DinD)**.
@@ -23,10 +21,6 @@ Allowing nesting namespaces three levels deep:<br/>
 Running Docker or Podman as root can be a bit of a security risk, especially as we've seen quite an increase in malware such as the [Shai-Hulud worm](https://www.microsoft.com/en-us/security/blog/2025/12/09/shai-hulud-2-0-guidance-for-detecting-investigating-and-defending-against-the-supply-chain-attack/) and AI tools like [OpenClaw](https://github.com/openclaw/openclaw) gaining full access to your machine.
 
 Running containers in an unprivileged LXC containers with rootless Docker/Podman adds an extra layer of security and reduces the blast radius, as even if a container is compromised, the attacker would still be limited by the unprivileged LXC and standard/non-admin user restrictions.
-
-Even using the standard (rootful) Docker install and handing off the process to a standard user by adding the user to the `docker` group, still leaves a large attack surface, as the Docker daemon itself runs as root and can be exploited to gain root access to the host.
-
-I've had first hand experience of this while making changes to my only standard user account which had sudo privileges by making a typo in the `sudoers` file I managed to lock myself out of the system, luckily for me I remembered that Docker runs as root and I was able to use a Docker to mount the affected `sudoers` config file in a container and fix it, which I should not be able to do.
 
 import TOCInline from '@theme/TOCInline';
 
@@ -449,6 +443,18 @@ After setting up your Forgejo instance, navigate to **Site administration** → 
 Create a new Access token from **Applications** in your Forgejo account settings, with `issue`, `misc`, `organization`, `package`, and `repository` permissions and add it as a secret named `ACTIONS_TOKEN` under **Actions** → **Secrets**.
 
 Now workflows that use Docker will be able to run inside the unprivileged LXC container using rootless Docker in Docker (DinD).
+
+## Conclusion
+
+Running the Docker daemon as `root` or simply granting a user Docker access via the `docker` group creates a large, unnecessary attack surface. I learned this the hard way: a typo in `sudoers` locked me out of one of my servers, and because Docker runs as `root` I was able to mount and fix the file from a container, a capability that should not have been possible.
+
+**Why unprivileged LXCs + rootless Docker matters**
+
+- Reduced blast radius: compromises are confined to the unprivileged LXC and the non-root user.
+- Safer CI/runner workflows: enables Docker-in-Docker (DinD) for runners without exposing host-level Docker.
+- Practical: GPU passthrough and hardware-accelerated workloads still work when configured correctly.
+
+For production and self-hosting deployments, prefer running container engines rootless inside unprivileged LXC containers, as it preserves container convenience while significantly lowering host risk.
 
 ## Additional resources
 
