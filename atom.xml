@@ -72,8 +72,6 @@
         <category label="LXC" term="LXC"/>
         <category label="Self-hosting" term="Self-hosting"/>
         <category label="Docker" term="Docker"/>
-        <category label="YouTube" term="YouTube"/>
-        <category label="Video" term="Video"/>
     </entry>
     <entry>
         <title type="html"><![CDATA[Containers Up!]]></title>
