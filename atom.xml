@@ -8,12 +8,12 @@
     <subtitle>DigitallyRefined Blog</subtitle>
     <icon>https://DigitallyRefined.github.io/img/favicon.ico</icon>
     <entry>
-        <title type="html"><![CDATA[Proxmox Unprivileged LXC Rootless Docker/Podman]]></title>
+        <title type="html"><![CDATA[Running rootless Docker on a Proxmox unprivileged LXC]]></title>
         <id>https://DigitallyRefined.github.io/guides/PVE-unprivileged-LXC-rootless-containers</id>
         <link href="https://DigitallyRefined.github.io/guides/PVE-unprivileged-LXC-rootless-containers"/>
         <updated>2026-02-04T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[By default Proxmox Unprivileged LXC containers only allow running Docker/Podman as root. In this guide we will set up rootless Docker inside an unprivileged LXC container.]]></summary>
-        <content type="html"><![CDATA[<p>By default Proxmox Unprivileged LXC containers only allow running Docker/Podman as <code>root</code>. In this guide we will set up rootless Docker inside an unprivileged LXC container.</p>
+        <summary type="html"><![CDATA[By default Proxmox unprivileged LXC containers only allow running Docker/Podman as root. In this guide we will set up rootless Docker inside an unprivileged LXC container.]]></summary>
+        <content type="html"><![CDATA[<p>By default Proxmox unprivileged LXC containers only allow running Docker/Podman as <code>root</code>. In this guide we will set up rootless Docker inside an unprivileged LXC container.</p>
 <p>Allowing nesting namespaces three levels deep:<br>
 <strong>Proxmox Host</strong> → <strong>Unprivileged LXC</strong> → <strong>Rootless Docker/Podman</strong> → <strong>Docker in Docker (DinD)</strong>.</p>
 <!-- -->
