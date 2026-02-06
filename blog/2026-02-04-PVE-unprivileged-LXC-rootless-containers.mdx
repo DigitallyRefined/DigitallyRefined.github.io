@@ -6,7 +6,7 @@ tags:
   - Self-hosting
   - Docker
 last_update:
-  date: 2026-02-05
+  date: 2026-02-06
 ---
 
 # Running rootless Docker on a Proxmox unprivileged LXC
@@ -296,8 +296,7 @@ providers:
 ssh user@192.168...
 mkdir -p forgejo/runner
 cd forgejo
-mkdir -p ./data/var/lib/gitea ./data/etc/gitea ./data/etc/act_runner
-sudo chown -R 100999:100999 data
+unshare -rU --map-auto sh -c "mkdir data && chown 1000:1000 data"
 ```
 
 `forgejo/docker-compose.yml`
