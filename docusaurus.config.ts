@@ -142,11 +142,17 @@ const config: Config = {
     },
   } satisfies Preset.ThemeConfig,
 
-  scripts: [
-    {
-      src: 'https://app.tinyanalytics.io/pixel/DgTq8YQ6wysFwYDx',
-      async: true,
-    },
+  plugins: [
+    () => ({
+      name: 'cloudflare-beacon',
+      injectHtmlTags() {
+        return {
+          postBodyTags: [
+            `<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "723384750f9542e089e4a55bb2d2d1b7"}'></script>`,
+          ],
+        };
+      },
+    }),
   ],
 };
 
