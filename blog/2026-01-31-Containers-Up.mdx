@@ -58,7 +58,7 @@ The simplest way to get started is with the following `compose.yml`:
 services:
   containers-up:
     # https://github.com/DigitallyRefined/containers-up/releases
-    image: ghcr.io/digitallyrefined/containers-up:1.4.3
+    image: ghcr.io/digitallyrefined/containers-up:1.4.5
     restart: unless-stopped
     ports:
       - 3000:3000 # Main dashboard
@@ -197,7 +197,7 @@ certificatesResolvers:
 services:
   containers-up:
     # https://github.com/DigitallyRefined/containers-up/releases
-    image: ghcr.io/digitallyrefined/containers-up:1.4.3
+    image: ghcr.io/digitallyrefined/containers-up:1.4.5
     restart: unless-stopped
     volumes:
       - ./containers-up/storage:/storage
@@ -351,7 +351,7 @@ Optional configuration such as authentication and notifications can be set via a
 ```yaml
 services:
   containers-up:
-    image: ghcr.io/digitallyrefined/containers-up:1.4.3
+    image: ghcr.io/digitallyrefined/containers-up:1.4.5
     # ... other settings ...
     env_file:
       - ./.env
