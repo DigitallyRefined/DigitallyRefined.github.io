@@ -6,7 +6,7 @@ tags:
   - Self-hosting
   - Docker
 last_update:
-  date: 2026-02-06
+  date: 2026-02-28
 ---
 
 # Running rootless Docker on a Proxmox unprivileged LXC
@@ -194,12 +194,9 @@ services:
     ports:
       - '80:80'
       - '443:443'
-      # (Optional) Expose Dashboard
-      # - '8080:8080' # Don't do this in production!
     volumes:
       - ./data/config:/etc/traefik:ro
       - ./data/certs:/certs
-      - ./data/plugins:/plugins-local:ro
       - ${XDG_RUNTIME_DIR}/docker.sock:/var/run/docker.sock:ro
     init: true
     healthcheck:
@@ -212,6 +209,9 @@ services:
       - LEGO_DISABLE_CNAME_SUPPORT=true
     env_file:
       - .env
+    dns:
+      - "1.1.1.1"
+      - "1.0.0.1"
     networks:
       - 'traefik'
     labels:
@@ -221,6 +221,14 @@ services:
       traefik.http.routers.traefik-ping.entrypoints: web
       # Override HTTPS redirect
       traefik.http.routers.traefik-ping.priority: 2000
+
+      traefik.http.routers.traefik-wildcard.entrypoints: web,websecure
+      traefik.http.routers.traefik-wildcard.rule: Host(`example.dedyn.io`)
+      traefik.http.routers.traefik-wildcard.tls: true
+      traefik.http.routers.traefik-wildcard.tls.certresolver: production-desec-dns
+      traefik.http.routers.traefik-wildcard.tls.domains[0].main: "*.example.dedyn.io"
+      traefik.http.routers.traefik-wildcard.tls.domains[0].sans: "example.dedyn.io"
+      traefik.http.routers.traefik-wildcard.service: noop@internal
 
 networks:
   traefik:
@@ -234,7 +242,7 @@ DESEC_TOKEN= # Add your deSEC API token
 
 This example uses deSEC as the provider for Let's Encrypt DNS challenges, you can register for a free subdomain and get an API token from your [deSEC account](https://desec.io/) or bring your own domain.
 
-`traefik/config/traefik.yml`
+`traefik/data/config/traefik.yml`
 ```yaml
 entryPoints:
   web:
@@ -250,13 +258,6 @@ entryPoints:
 
   websecure:
     address: ":443"
-    http:
-      tls:
-        certResolver: production-desec-dns
-        domains:
-          - main: "example.dedyn.io"
-            sans:
-              - "*.example.dedyn.io"
 
 ping:
   entryPoint: web
