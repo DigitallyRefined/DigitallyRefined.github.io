@@ -12,7 +12,7 @@ import type { Props } from '@theme/BlogListPage';
 import Link from '@docusaurus/Link';
 import Heading from '@theme/Heading';
 
-import docCardStyles from '@docusaurus/theme-classic/lib/theme/DocCard/styles.module.css';
+import docCardStyles from '@docusaurus/theme-classic/lib/theme/DocCard/Layout/styles.module.css';
 
 function BlogCard({
   permalink,
