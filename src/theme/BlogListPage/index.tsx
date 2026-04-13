@@ -9,48 +9,24 @@ import BlogLayout from '@theme/BlogLayout';
 import BlogListPaginator from '@theme/BlogListPaginator';
 import type { Props } from '@theme/BlogListPage';
 
-import Link from '@docusaurus/Link';
-import Heading from '@theme/Heading';
+import type { PropSidebarItemLink } from '@docusaurus/plugin-content-docs';
+import DocCardLayout from '@theme/DocCard/Layout';
 
-import docCardStyles from '@docusaurus/theme-classic/lib/theme/DocCard/styles.module.css';
-
-function BlogCard({
-  permalink,
-  title,
-  description,
-}: {
-  permalink: string;
-  title: string;
-  description: string;
-}) {
+function BlogCardList({ items }: { items: PropSidebarItemLink[] }) {
   return (
-    <Link
-      href={permalink}
-      className={clsx('card', 'padding--lg', docCardStyles.cardContainer)}
-      style={{
-        // Mimic DocCard's styles.cardContainer behavior if needed,
-        // but 'card' class handles most of it in standard Infima.
-        // We can add a bit of hover effect if standard card doesn't have it fully.
-        height: '100%',
-        textDecoration: 'none',
-      }}
-    >
-      <Heading
-        as="h2"
-        className={clsx('text--truncate', docCardStyles.cardTitle)}
-        title={title}
-      >
-        📄️ {title}
-      </Heading>
-      {description && (
-        <p
-          className={clsx('text--truncate', docCardStyles.cardDescription)}
-          title={description}
-        >
-          {description}
-        </p>
-      )}
-    </Link>
+    <section className="row">
+      {items.map((item) => (
+        <article className="col col--6 margin-bottom--lg" key={item.href}>
+          <DocCardLayout
+            item={item}
+            href={item.href}
+            title={item.label}
+            description={item.description}
+            icon="📄️"
+          />
+        </article>
+      ))}
+    </section>
   );
 }
 
@@ -73,20 +49,15 @@ function BlogListPageContent(props: Props): ReactNode {
 
       <h2>Latest posts</h2>
 
-      <section className="row">
-        {items.map(({ content: BlogPostContent }) => (
-          <article
-            className="col col--6 margin-bottom--lg"
-            key={BlogPostContent.metadata.permalink}
-          >
-            <BlogCard
-              permalink={BlogPostContent.metadata.permalink}
-              title={BlogPostContent.metadata.title}
-              description={BlogPostContent.metadata.description}
-            />
-          </article>
-        ))}
-      </section>
+      <BlogCardList
+        items={items.map(({ content: BlogPostContent }) => ({
+          type: 'link',
+          href: BlogPostContent.metadata.permalink,
+          label: BlogPostContent.metadata.title,
+          description: BlogPostContent.metadata.description,
+        }))}
+      />
+
       <BlogListPaginator metadata={metadata} />
     </BlogLayout>
   );
