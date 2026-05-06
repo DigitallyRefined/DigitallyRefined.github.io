@@ -16,7 +16,7 @@
     "update-dependencies": "npx npm-check-updates --target minor --upgrade && npm i && npx npm-check-updates"
   },
   "dependencies": {
-    "@docusaurus/core": "3.10.0",
+    "@docusaurus/core": "3.10.1",
     "@docusaurus/faster": "3.10.1",
     "@docusaurus/preset-classic": "3.10.0",
     "@giscus/react": "^3.1.0",
