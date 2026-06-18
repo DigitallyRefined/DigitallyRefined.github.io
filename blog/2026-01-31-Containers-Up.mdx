@@ -7,7 +7,7 @@ tags:
   - YouTube
   - Video
 last_update:
-  date: 2026-02-02
+  date: 2026-06-18
 ---
 
 # Containers Up!
@@ -58,7 +58,7 @@ The simplest way to get started is with the following `compose.yml`:
 services:
   containers-up:
     # https://github.com/DigitallyRefined/containers-up/releases
-    image: ghcr.io/digitallyrefined/containers-up:1.4.5
+    image: ghcr.io/digitallyrefined/containers-up:1.4.6
     restart: unless-stopped
     ports:
       - 3000:3000 # Main dashboard
@@ -197,7 +197,7 @@ certificatesResolvers:
 services:
   containers-up:
     # https://github.com/DigitallyRefined/containers-up/releases
-    image: ghcr.io/digitallyrefined/containers-up:1.4.5
+    image: ghcr.io/digitallyrefined/containers-up:1.4.6
     restart: unless-stopped
     volumes:
       - ./containers-up/storage:/storage
@@ -351,7 +351,7 @@ Optional configuration such as authentication and notifications can be set via a
 ```yaml
 services:
   containers-up:
-    image: ghcr.io/digitallyrefined/containers-up:1.4.5
+    image: ghcr.io/digitallyrefined/containers-up:1.4.6
     # ... other settings ...
     env_file:
       - ./.env
@@ -401,7 +401,6 @@ Create `.github/dependabot.template.yml`:
 
 ```yaml
 version: 2
-enable-beta-ecosystems: true # Remove once docker-compose updates become stable
 updates:
   - package-ecosystem: 'docker-compose'
     directory: '**/docker-compose.yml'
@@ -410,6 +409,8 @@ updates:
       day: 'saturday'
       time: '01:23'
       timezone: 'Europe/London' # <-- Change to your timezone
+    cooldown:
+      default-days: 5
 
   - package-ecosystem: 'github-actions'
     directory: '/'
@@ -418,6 +419,8 @@ updates:
       day: 'saturday'
       time: '01:23'
       timezone: 'Europe/London' # <-- Change to your timezone
+    cooldown:
+      default-days: 5
 ```
 
 #### 3. Add GitHub Action to Generate Dependabot Config
