@@ -108,8 +108,8 @@ const config: Config = {
               rel: 'me',
             },
             {
-              label: 'Twitter',
-              href: 'https://twitter.com/DigitallyRefine',
+              label: 'X',
+              href: 'https://x.com/DigitallyRefine',
             },
             {
               html: `<a href="#" onClick="ygm=['snowy', 'barge', 'swan'].join('-')+'@'+'duck.com';this.href='mailto:'+ygm;this.text=ygm;" class="footer__link-item">Contact me<svg width="13.5" height="13.5" aria-label="(opens in email client)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a>`,
@@ -124,8 +124,8 @@ const config: Config = {
               href: 'https://www.youtube.com/@DigitallyRefined',
             },
             {
-              label: 'Liberapay',
-              href: 'https://liberapay.com/DigitallyRefined/donate',
+              label: 'Sponsor',
+              href: 'https://github.com/sponsors/DigitallyRefined',
             },
             {
               label: 'GitHub',
