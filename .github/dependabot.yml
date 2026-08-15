@@ -9,6 +9,7 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+      day: sunday
     groups:
       docusaurus:
         patterns:
@@ -24,5 +25,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: sunday
     cooldown:
       default-days: 5
